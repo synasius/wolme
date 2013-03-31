@@ -2,7 +2,7 @@
 import os
 PROJECT_PATH = os.path.realpath(os.path.dirname(__file__))
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -47,18 +47,18 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = os.path.realpath(os.path.join(PROJECT_PATH, "..", "media"))
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.realpath(os.path.join(PROJECT_PATH, "..", "static"))
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -97,7 +97,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'wallet.middleware.Ciccio',
 )
 
 ROOT_URLCONF = 'wolme.urls'
@@ -105,7 +104,9 @@ ROOT_URLCONF = 'wolme.urls'
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'wolme.wsgi.application'
 
-TEMPLATE_DIRS = (os.path.join(PROJECT_PATH, '..', 'templates'))
+TEMPLATE_DIRS = (
+    os.path.realpath(os.path.join(PROJECT_PATH, '..', 'templates')), 
+)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
