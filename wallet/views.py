@@ -1,23 +1,12 @@
 # Create your views here.
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from wallet.models import Wallet
 from wallet.serializers import WalletSerializer
 
 
-class JSONResponse(HttpResponse):
-    """
-    An HttpResponse that renders it's content into JSON.
-    """
-    def __init__(self, data, **kwargs):
-        content = JSONRenderer().render(data)
-        kwargs['content_type'] = 'application/json'
-        super(JSONResponse, self).__init__(content, **kwargs)
-
-
-@csrf_exempt
+@api_view("GET", "POST")
 def wallet_list(request):
     """
     List all wallets, or create a new wallet
@@ -25,19 +14,18 @@ def wallet_list(request):
     if request.method == "GET":
         wallets = Wallet.objects.all()
         serializer = WalletSerializer(wallets, many=True)
-        return JSONResponse(serializer.data)
+        return Response(serializer.data)
 
-    if request.method == "POST":
-        data = JSONParser().parse(request)
-        serializer = WalletSerializer(data=data)
+    elif request.method == "POST":
+        serializer = WalletSerializer(data=request.DATA)
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data, status=201)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return JSONResponse(serializer.errors, status=400)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@csrf_exempt
+@api_view("GET", "PUT", "DELETE")
 def wallet_detail(request, pk):
     """
     Retrieve, update or delete a wallet
@@ -45,21 +33,20 @@ def wallet_detail(request, pk):
     try:
         snippet = Wallet.objects.get(pk=pk)
     except Wallet.DoesNotExist:
-        return HttpResponse(status=404)
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
         serializer = WalletSerializer(snippet)
-        return JSONResponse(serializer.data)
+        return Response(serializer.data)
 
     elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = WalletSerializer(snippet, data=data)
+        serializer = WalletSerializer(snippet, data=request.DATA)
         if serializer.is_valid():
             serializer.save()
-            return JSONResponse(serializer.data)
+            return Response(serializer.data)
         else:
-            return JSONResponse(serializer.errors, status=400)
+            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
 
     elif request.method == 'DELETE':
         snippet.delete()
-        return HttpResponse(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
