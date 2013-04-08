@@ -1,6 +1,8 @@
 # Create your views here.
 from django.http import Http404
 
+from rest_framework import generics
+from rest_framework import mixins
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -9,49 +11,31 @@ from wallet.models import Wallet
 from wallet.serializers import WalletSerializer
 
 
-class WalletList(APIView):
-    """
-    List all wallets, or create a new wallet
-    """
-    def get(self, request, format=None):
-        wallets = Wallet.objects.all()
-        serializer = WalletSerializer(wallets, many=True)
-        return Response(serializer.data)
+class WalletList(mixins.ListModelMixin,
+                 mixins.CreateModelMixin,
+                 generics.MultipleObjectAPIView):
+    model = Wallet
+    serializer_class = WalletSerializer
 
-    def post(self, request, format=None):
-        serializer = WalletSerializer(data=request.DATA)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
 
 
-class WalletDetail(APIView):
-    """
-    Retrieve, update or delete a wallet
-    """
-    def get_object(self, pk):
-        try:
-            return Wallet.objects.get(pk=pk)
-        except Wallet.DoesNotExist:
-            raise Http404
+class WalletDetail(mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
+                   mixins.DestroyModelMixin,
+                   generics.SingleObjectAPIView):
+    model = Wallet
+    serializer_class = WalletSerializer
 
-    def get(self, request, pk, format=None):
-        wallet = self.get_object(pk)
-        serializer = WalletSerializer(wallet)
-        return Response(serializer.data)
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
 
-    def put(self, request, pk, format=None):
-        wallet = self.get_object(pk)
-        serializer = WalletSerializer(wallet, data=request.DATA)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        else:
-            return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
 
-    def delete(self, request, pk, format=None):
-        wallet = self.get_object(pk)
-        wallet.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
