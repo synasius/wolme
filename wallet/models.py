@@ -16,7 +16,7 @@ class Wallet(models.Model):
     CURRENCIES = (
         ("EUR", "EUR"),
     )
-    user = models.ForeignKey(User)
+    user = models.ForeignKey('auth.User', related_name='wallets')
     label = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
     currency = models.CharField(max_length=3, null=False, blank=False, choices=CURRENCIES)
