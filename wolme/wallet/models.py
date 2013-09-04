@@ -1,30 +1,39 @@
+from __future__ import unicode_literals
+
+from django.conf import settings
 from django.db import models
-from django.contrib.auth.models import User
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
 
-# Create your models here.
+@python_2_unicode_compatible
 class Tag(models.Model):
-    slug = models.SlugField(unique=True)
+    slug = models.SlugField()
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tags')
     description = models.TextField(null=True, blank=True)
 
-    def __unicode__(self):
+    class Meta:
+        unique_together = ('slug', 'user')
+
+    def __str__(self):
         return self.slug
 
 
+@python_2_unicode_compatible
 class Wallet(models.Model):
     CURRENCIES = (
         ("EUR", "EUR"),
     )
-    user = models.ForeignKey('auth.User', related_name='wallets')
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='wallets')
     label = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
     currency = models.CharField(max_length=3, null=False, blank=False, choices=CURRENCIES)
 
-    def __unicode__(self):
-        return u"{} ({})".format(self.label, self.currency)
+    def __str__(self):
+        return "{} ({})".format(self.label, self.currency)
 
 
+@python_2_unicode_compatible
 class Movement(models.Model):
     MOVEMENT_IN = "in"
     MOVEMENT_OUT = "out"
@@ -40,6 +49,6 @@ class Movement(models.Model):
 
     tags = models.ManyToManyField(Tag, related_name="movements")
 
-    def __unicode__(self):
-        return u"{} - {:.2f} for {} on {}".format(
+    def __str__(self):
+        return "{} - {:.2f} for {} on {}".format(
             self.type, self.amount, self.wallet, self.date)
