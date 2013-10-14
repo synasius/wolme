@@ -8,12 +8,8 @@ from django.utils.translation import ugettext as _
 
 @python_2_unicode_compatible
 class Tag(models.Model):
-    slug = models.SlugField()
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tags')
+    slug = models.SlugField(unique=True)
     description = models.TextField(null=True, blank=True)
-
-    class Meta:
-        unique_together = ('slug', 'user')
 
     def __str__(self):
         return self.slug
