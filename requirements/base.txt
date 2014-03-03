@@ -1,5 +1,5 @@
 # Project
-Django==1.6.1
+Django<1.7
 djangorestframework==2.3.12
 South==0.8.4
 
