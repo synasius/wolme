@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext as _
 
@@ -32,7 +33,7 @@ class Wallet(models.Model):
 @python_2_unicode_compatible
 class Movement(models.Model):
     wallet = models.ForeignKey(Wallet, related_name="movements")
-    date = models.DateTimeField()
+    date = models.DateTimeField(default=timezone.now())
     amount = models.DecimalField(max_digits=11, decimal_places=2)
 
     tags = models.ManyToManyField(Tag, related_name="movements")
