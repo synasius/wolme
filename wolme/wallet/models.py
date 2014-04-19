@@ -32,7 +32,8 @@ class Wallet(models.Model):
 
 @python_2_unicode_compatible
 class Movement(models.Model):
-    wallet = models.ForeignKey(Wallet, related_name="movements")
+    from_wallet = models.ForeignKey(Wallet, related_name="outgoing")
+    to_wallet = models.ForeignKey(Wallet, related_name="incoming")
     date = models.DateTimeField(default=timezone.now())
     amount = models.DecimalField(max_digits=11, decimal_places=2)
 
