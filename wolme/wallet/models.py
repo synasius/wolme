@@ -31,15 +31,7 @@ class Wallet(models.Model):
 
 @python_2_unicode_compatible
 class Movement(models.Model):
-    MOVEMENT_IN = "in"
-    MOVEMENT_OUT = "out"
-    MOVEMENT_TYPES = (
-        (MOVEMENT_IN, _("In")),
-        (MOVEMENT_OUT, _("Out")),
-    )
-
     wallet = models.ForeignKey(Wallet, related_name="movements")
-    type = models.CharField(max_length=10, choices=MOVEMENT_TYPES)
     date = models.DateTimeField()
     amount = models.DecimalField(max_digits=11, decimal_places=2)
 
