@@ -1,6 +1,7 @@
 # Project
 Django<1.7
 djangorestframework==2.3.13
+django-money==0.4.1
 
 # Database
 psycopg2==2.5.2
